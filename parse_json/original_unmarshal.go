@@ -15,6 +15,7 @@ type DueDate struct {
 type Task struct {
 	Name string  `json:"name"`
 	Time DueDate `json:"time"`
+	Done bool    `json:"done"`
 }
 
 func (d *DueDate) UnmarshalJSON(raw []byte) error {
@@ -28,7 +29,8 @@ func (d *DueDate) UnmarshalJSON(raw []byte) error {
 }
 
 var jsonString = []byte(`[
-	{"name": "lunch", "time": 1486600200}
+	{"name": "lunch", "time": 1486600200, "done":true},
+	{"name": "dinner", "time": 1586600200}
 ]`)
 
 func main() {
