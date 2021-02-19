@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -35,9 +34,9 @@ func main() {
 func findImageURL() ([]imageInfo, error) {
 	const (
 		// Set target URL
-		targetURL = ""
+		targetURL = "https://gamerch.com/pjsekai/entry/184286"
 		// Set target tag
-		targetTag = ""
+		targetTag = ".mu__wikidb-list .mu__table tbody tr"
 	)
 
 	driver := agouti.ChromeDriver()
@@ -56,6 +55,12 @@ func findImageURL() ([]imageInfo, error) {
 		return nil, err
 	}
 
+	b := page.Find("body")
+	for i := 0; i < 100; i++ {
+		ctl := "\uE00F" // keycode
+		b.SendKeys(ctl) // scroll down
+	}
+
 	content, err := page.HTML()
 	if err != nil {
 		return nil, err
@@ -67,18 +72,22 @@ func findImageURL() ([]imageInfo, error) {
 		return res, err
 	}
 
-	doc.Find(targetTag).Each(func(i int, s *goquery.Selection) {
-		h, _ := s.Html()
-		fmt.Println(h)
-
-		u, ok := s.Attr("src")
+	doc.Find(targetTag).Each(func(_ int, s *goquery.Selection) {
+		u, ok := s.Find("img").Attr("src")
 		if !ok {
 			log.Fatal("failed to load attribute")
 		}
 
+		var name string
+		s.Find("td a").Each(func(_ int, ss *goquery.Selection) {
+			if ss.Text() != "" {
+				name = ss.Text()
+			}
+		})
+
 		res = append(res, imageInfo{
-			name: fmt.Sprintf("%d", i),
-			u:    u,
+			name: strings.ToLower(strings.Replace(name, " ", "_", -1)),
+			u:    strings.Replace(u, "thumb/", "", 1),
 		})
 	})
 
