@@ -55,6 +55,7 @@ func findImageURL() ([]imageInfo, error) {
 		return nil, err
 	}
 
+	// Scroll down to load the lazyload images
 	b := page.Find("body")
 	for i := 0; i < 100; i++ {
 		ctl := "\uE00F" // keycode
